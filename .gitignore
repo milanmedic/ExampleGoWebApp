@@ -1,0 +1,4 @@
+TaskAPI/go.sum
+TaskAPI/go.mod
+.vscode
+postgres_db/postgres-data
