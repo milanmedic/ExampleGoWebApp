@@ -22,6 +22,7 @@ func setupRoutes(router *httprouter.Router) {
 	router.GET("/task/:id", getTask)
 	router.DELETE("/task/:id", deleteTask)
 	router.PATCH("/task/:id", updateTask)
+	router.PATCH("/task/:id/complete", completeTask)
 }
 
 func getAllTasks(wr http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -73,11 +74,31 @@ func getTask(wr http.ResponseWriter, r *http.Request, params httprouter.Params) 
 }
 
 func deleteTask(wr http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	wr.WriteHeader(http.StatusOK)
-	wr.Write([]byte(params.ByName("id")))
+	id := params.ByName("id")
+	err := service.DeleteTask(id)
+	if err != nil {
+		wr.WriteHeader(http.StatusInternalServerError)
+	}
+	wr.WriteHeader(http.StatusNoContent)
 }
 
 func updateTask(wr http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	wr.WriteHeader(http.StatusOK)
-	wr.Write([]byte(params.ByName("id")))
+	id := params.ByName("id")
+	var newTaskData models.EditTaskDto
+	json.NewDecoder(r.Body).Decode(&newTaskData)
+
+	err := service.EditTask(id, newTaskData)
+	if err != nil {
+		wr.WriteHeader(http.StatusInternalServerError)
+	}
+	wr.WriteHeader(http.StatusNoContent)
+}
+
+func completeTask(wr http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	id := params.ByName("id")
+	err := service.CompleteTask(id)
+	if err != nil {
+		wr.WriteHeader(http.StatusInternalServerError)
+	}
+	wr.WriteHeader(http.StatusNoContent)
 }
