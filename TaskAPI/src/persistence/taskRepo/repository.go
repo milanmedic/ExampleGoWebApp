@@ -24,22 +24,7 @@ type TaskRepositer interface {
 
 func CreateTaskRepository(db *db.Database) TaskRepositer {
 	tr := &taskRepo{db: db}
-	tr.SetupTaskTable()
 	return tr
-}
-
-//TODO: Encapsulate in SETUP DATABASE for example, and create all the tables there
-func (tr taskRepo) SetupTaskTable() {
-	db := tr.db.GetDbConnection()
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS tasks(
-		id uuid PRIMARY KEY,
-		name VARCHAR(100) UNIQUE NOT NULL,
-		description TEXT,
-		status BOOLEAN DEFAULT FALSE
-	);`)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (tr taskRepo) GetTask(taskId string) (Task.Tasker, error) {

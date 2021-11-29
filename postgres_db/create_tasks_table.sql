@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS tasks(
+		id uuid PRIMARY KEY,
+		name VARCHAR(100) UNIQUE NOT NULL,
+		description TEXT,
+		status BOOLEAN DEFAULT FALSE
+);
