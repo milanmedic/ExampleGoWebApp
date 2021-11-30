@@ -22,6 +22,7 @@ func main() {
 	router := httprouter.New()
 	db := db.CreateDb()
 	db.Connect()
+	db.GetDbConnection().Ping()
 	defer db.Disconnect()
 	HandleRoutes(router, db)
 	server := &http.Server{

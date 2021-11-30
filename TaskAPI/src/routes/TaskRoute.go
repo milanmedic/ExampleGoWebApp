@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -28,17 +29,15 @@ func setupRoutes(router *httprouter.Router) {
 func getAllTasks(wr http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	tasks, err := service.GetTasks()
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
-	if len(tasks) <= 0 {
-		wr.WriteHeader(http.StatusNotFound)
-	}
+
 	output, err := json.MarshalIndent(tasks, "", "\t")
 	if err != nil {
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	wr.Header().Set("Content-Type", "application/json")
-	wr.WriteHeader(http.StatusOK)
 	wr.Write(output)
 }
 
@@ -46,17 +45,18 @@ func addTask(wr http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var task models.NewTaskInputDto
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	service.AddTask(task)
 	wr.WriteHeader(http.StatusCreated)
-	wr.Write([]byte("Add Task Route"))
 }
 
 func getTask(wr http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	id := params.ByName("id")
 	task, err := service.GetTask(id)
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	if task == nil {
@@ -64,6 +64,7 @@ func getTask(wr http.ResponseWriter, r *http.Request, params httprouter.Params) 
 	}
 	output, err := json.Marshal(task)
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	// Only valid order for customizing headers
@@ -77,6 +78,7 @@ func deleteTask(wr http.ResponseWriter, r *http.Request, params httprouter.Param
 	id := params.ByName("id")
 	err := service.DeleteTask(id)
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	wr.WriteHeader(http.StatusNoContent)
@@ -89,6 +91,7 @@ func updateTask(wr http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	err := service.EditTask(id, newTaskData)
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	wr.WriteHeader(http.StatusNoContent)
@@ -98,6 +101,7 @@ func completeTask(wr http.ResponseWriter, r *http.Request, params httprouter.Par
 	id := params.ByName("id")
 	err := service.CompleteTask(id)
 	if err != nil {
+		fmt.Println(err)
 		wr.WriteHeader(http.StatusInternalServerError)
 	}
 	wr.WriteHeader(http.StatusNoContent)

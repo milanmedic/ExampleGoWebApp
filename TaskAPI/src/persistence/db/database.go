@@ -3,17 +3,19 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
 const (
-	host     = "localhost"
 	port     = 5432
 	user     = "taskapp"
 	password = "taskapp"
 	dbname   = "taskapp"
 )
+
+var host string = os.Getenv("DB_HOST")
 
 type Database struct {
 	connection       *sql.DB
@@ -33,6 +35,13 @@ func (d *Database) Connect() {
 	}
 	d.connection = db
 	fmt.Println("Database connected")
+	for {
+		err := d.connection.Ping()
+		if err == nil {
+			break
+		}
+	}
+	fmt.Println("Database ready to accept communication!")
 }
 
 func (d *Database) GetDbConnection() *sql.DB {
